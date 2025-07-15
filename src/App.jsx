@@ -12,6 +12,7 @@ const THEME_KEY = 'theme';
 const SEARCH_KEY = 'search';
 const PRICE_FILTER_KEY = 'priceFilter';
 const SORT_ORDER_KEY = 'sortOrder';
+const CATEGORY_FILTER_KEY = 'categoryFilter';
 
 function App() {
   const [search, setSearch] = useState(() => {
@@ -47,7 +48,14 @@ function App() {
       return 'default';
     }
   });
-  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState(() => {
+    try {
+      return localStorage.getItem(CATEGORY_FILTER_KEY) || 'All';
+    } catch {
+      return 'All';
+    }
+  });
+  const [filterRipples, setFilterRipples] = useState({});
   const categories = ['All', ...Array.from(new Set(productData.map(p => p.category)))];
 
   // Save cart to localStorage
@@ -65,6 +73,9 @@ function App() {
   useEffect(() => {
     localStorage.setItem(SORT_ORDER_KEY, sortOrder);
   }, [sortOrder]);
+  useEffect(() => {
+    localStorage.setItem(CATEGORY_FILTER_KEY, categoryFilter);
+  }, [categoryFilter]);
 
   useEffect(() => {
     document.documentElement.classList.add('dark');
@@ -115,7 +126,7 @@ function App() {
 
   // Filter and sort products
   const filteredProducts = productData
-    .filter(p => (categoryFilter === 'all' ? true : p.category === categoryFilter))
+    .filter(p => (categoryFilter === 'All' ? true : p.category === categoryFilter))
     .filter(p => p.name.toLowerCase().includes(search.toLowerCase()))
     .filter(p => {
       if (priceFilter === 'lt500') return p.price < 500;
@@ -131,7 +142,7 @@ function App() {
     <div className="min-h-screen bg-gray-900 font-sans">
       <Navbar onCartClick={handleCartIconClick} cartCount={cart.reduce((sum, item) => sum + item.count, 0)} />
       <SimpleBar className="custom-simplebar" style={{ maxHeight: 'calc(100vh - 72px)' }}>
-        <section className="flex flex-col items-center justify-center py-20 bg-gray-900">
+        <section className="flex flex-col items-center justify-center py-20 bg-gray-900 animate-fade-in" style={{ animationDelay: '0.1s' }}>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-yellow-300 mb-4 text-center drop-shadow">Welcome to MyCart</h1>
           <p className="text-lg text-gray-300 mb-10 text-center max-w-xl">Find the best products at unbeatable prices. Search and add to your cart instantly!</p>
           <div className="w-full flex justify-center mb-4">
@@ -158,9 +169,15 @@ function App() {
                   {categories.map(cat => (
                     <button
                       key={cat}
-                      onClick={() => setCategoryFilter(cat)}
-                      className={`px-4 py-2 rounded-full font-semibold cursor-pointer whitespace-nowrap ${categoryFilter === cat ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 text-yellow-200'} transition`}
+                      onClick={e => {
+                        setCategoryFilter(cat);
+                        setFilterRipples(r => ({ ...r, [cat]: false }));
+                        setTimeout(() => setFilterRipples(r => ({ ...r, [cat]: true })), 10);
+                      }}
+                      className={`px-4 py-2 rounded-full font-semibold cursor-pointer whitespace-nowrap transition-all duration-200 relative ${categoryFilter === cat ? 'bg-yellow-400 text-gray-900 pulse-once' : 'bg-gray-800 text-yellow-200'} animate-fade-in`}
+                      style={{ animationDelay: `${0.03 * categories.indexOf(cat)}s` }}
                     >
+                      {filterRipples[cat] && <span className="ripple-effect" onAnimationEnd={() => setFilterRipples(r => ({ ...r, [cat]: false }))} />}
                       {cat}
                     </button>
                   ))}
@@ -168,12 +185,12 @@ function App() {
               </div>
             </div>
             <div className="w-full flex flex-wrap gap-2 justify-center items-center mt-2">
-              <button onClick={() => setPriceFilter('all')} className={`px-4 py-2 rounded-full font-semibold cursor-pointer ${priceFilter === 'all' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 text-yellow-200'} transition`}>All</button>
-              <button onClick={() => setPriceFilter('lt500')} className={`px-4 py-2 rounded-full font-semibold cursor-pointer ${priceFilter === 'lt500' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 text-yellow-200'} transition`}>&lt; ₹500</button>
-              <button onClick={() => setPriceFilter('500to2000')} className={`px-4 py-2 rounded-full font-semibold cursor-pointer ${priceFilter === '500to2000' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 text-yellow-200'} transition`}>₹500–₹2000</button>
-              <button onClick={() => setPriceFilter('gt2000')} className={`px-4 py-2 rounded-full font-semibold cursor-pointer ${priceFilter === 'gt2000' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 text-yellow-200'} transition`}>&gt; ₹2000</button>
-              <span className="text-yellow-200 font-semibold ml-2 self-center">Sort by:</span>
-              <select value={sortOrder} onChange={e => setSortOrder(e.target.value)} className="rounded-full px-4 py-2 bg-gray-800 text-yellow-200 font-semibold focus:outline-none cursor-pointer">
+              <button onClick={() => setPriceFilter('all')} className={`px-4 py-2 rounded-full font-semibold cursor-pointer transition-all duration-200 ${priceFilter === 'all' ? 'bg-yellow-400 text-gray-900 animate-pop' : 'bg-gray-800 text-yellow-200 animate-fade-in'}`}>All</button>
+              <button onClick={() => setPriceFilter('lt500')} className={`px-4 py-2 rounded-full font-semibold cursor-pointer transition-all duration-200 ${priceFilter === 'lt500' ? 'bg-yellow-400 text-gray-900 animate-pop' : 'bg-gray-800 text-yellow-200 animate-fade-in'}`}>&lt; ₹500</button>
+              <button onClick={() => setPriceFilter('500to2000')} className={`px-4 py-2 rounded-full font-semibold cursor-pointer transition-all duration-200 ${priceFilter === '500to2000' ? 'bg-yellow-400 text-gray-900 animate-pop' : 'bg-gray-800 text-yellow-200 animate-fade-in'}`}>₹500–₹2000</button>
+              <button onClick={() => setPriceFilter('gt2000')} className={`px-4 py-2 rounded-full font-semibold cursor-pointer transition-all duration-200 ${priceFilter === 'gt2000' ? 'bg-yellow-400 text-gray-900 animate-pop' : 'bg-gray-800 text-yellow-200 animate-fade-in'}`}>&gt; ₹2000</button>
+              <span className="text-yellow-200 font-semibold ml-2 self-center animate-fade-in" style={{ animationDelay: '0.2s' }}>Sort by:</span>
+              <select value={sortOrder} onChange={e => setSortOrder(e.target.value)} className="rounded-full px-4 py-2 bg-gray-800 text-yellow-200 font-semibold focus:outline-none cursor-pointer animate-fade-in" style={{ animationDelay: '0.25s' }}>
                 <option value="default">Default</option>
                 <option value="asc">Price: Low to High</option>
                 <option value="desc">Price: High to Low</option>
@@ -210,7 +227,7 @@ function App() {
         onCheckout={handleCheckout}
       />
       {toast && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-yellow-400 text-gray-900 px-6 py-3 rounded-full shadow-lg font-bold text-lg z-50 animate-fade-in-up-out">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-yellow-400 text-gray-900 px-6 py-3 rounded-full shadow-lg font-bold text-lg z-50 animate-fade-in-up-out animate-fade-in" style={{ animationDelay: '0.1s' }}>
           {toast}
         </div>
       )}
