@@ -106,26 +106,4 @@ This project was originally built with HTML, CSS, and JavaScript. The following 
 ## Migration Note
 > **Note:** The app was fully migrated from vanilla HTML/CSS/JS to a modern React + Tailwind stack for maintainability, scalability, and a much improved user experience. All previous bug fixes and enhancements are preserved in this documentation for historical context.
 
----
-
-## Additional Notes from Legacy README
-
-### Overview
-This is a modern, responsive shopping cart web application built with HTML, CSS, and JavaScript. The project was refactored and enhanced using AI tools to ensure a clean, modular, and maintainable codebase, with a focus on UI/UX and cross-device compatibility.
-
-### How to Run (Legacy)
-1. Clone or download the repository.
-2. Open `src/index.html` in any modern web browser.
-3. No build step or server is required; all logic is client-side.
-
-### Optional Features for Future Work (Legacy)
-- Product filtering by price or category.
-- Cart item quantity adjustment and removal (already implemented in modal).
-- Checkout simulation and order summary.
-- Product images and more detailed descriptions.
-
----
-
 For any questions or suggestions, feel free to reach out!
-
-
