@@ -27,6 +27,13 @@ A fully refurbished, visually stunning shopping cart web app built with **React*
 
 ---
 
+## 🤖 AI Tools Used
+- Design - Framer
+- Code - Moonshot:Kimi K2
+- IDE - Cursor
+
+---
+
 ## 🛠️ Getting Started
 1. **Clone the repository:**
    ```bash
@@ -96,10 +103,10 @@ This project was originally built with HTML, CSS, and JavaScript. The following 
 
 ## 💡 Future Enhancements
 - Product images and categories
-- Product filtering by category/price
 - User authentication and order history
+- Admin Dashboard and User Dashboards
 - Payment/checkout simulation
-- Product reviews
+- Product reviews logic
 
 ---
 

@@ -47,6 +47,8 @@ function App() {
       return 'default';
     }
   });
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const categories = ['All', ...Array.from(new Set(productData.map(p => p.category)))];
 
   // Save cart to localStorage
   useEffect(() => {
@@ -113,6 +115,7 @@ function App() {
 
   // Filter and sort products
   const filteredProducts = productData
+    .filter(p => (categoryFilter === 'all' ? true : p.category === categoryFilter))
     .filter(p => p.name.toLowerCase().includes(search.toLowerCase()))
     .filter(p => {
       if (priceFilter === 'lt500') return p.price < 500;
@@ -148,15 +151,28 @@ function App() {
             </div>
           </div>
           {/* Filters and Sort */}
-          <div className="flex flex-col sm:flex-row gap-4 items-center mb-8">
-            <div className="flex gap-2">
+          <div className="w-full flex flex-col items-center mb-8">
+            <div className="w-full">
+              <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-yellow-400 scrollbar-track-gray-800 mx-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+                <div className="flex gap-2 justify-center px-2 flex-wrap">
+                  {categories.map(cat => (
+                    <button
+                      key={cat}
+                      onClick={() => setCategoryFilter(cat)}
+                      className={`px-4 py-2 rounded-full font-semibold cursor-pointer whitespace-nowrap ${categoryFilter === cat ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 text-yellow-200'} transition`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="w-full flex flex-wrap gap-2 justify-center items-center mt-2">
               <button onClick={() => setPriceFilter('all')} className={`px-4 py-2 rounded-full font-semibold cursor-pointer ${priceFilter === 'all' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 text-yellow-200'} transition`}>All</button>
               <button onClick={() => setPriceFilter('lt500')} className={`px-4 py-2 rounded-full font-semibold cursor-pointer ${priceFilter === 'lt500' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 text-yellow-200'} transition`}>&lt; ₹500</button>
               <button onClick={() => setPriceFilter('500to2000')} className={`px-4 py-2 rounded-full font-semibold cursor-pointer ${priceFilter === '500to2000' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 text-yellow-200'} transition`}>₹500–₹2000</button>
               <button onClick={() => setPriceFilter('gt2000')} className={`px-4 py-2 rounded-full font-semibold cursor-pointer ${priceFilter === 'gt2000' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 text-yellow-200'} transition`}>&gt; ₹2000</button>
-            </div>
-            <div className="flex gap-2 items-center">
-              <span className="text-yellow-200 font-semibold">Sort by:</span>
+              <span className="text-yellow-200 font-semibold ml-2 self-center">Sort by:</span>
               <select value={sortOrder} onChange={e => setSortOrder(e.target.value)} className="rounded-full px-4 py-2 bg-gray-800 text-yellow-200 font-semibold focus:outline-none cursor-pointer">
                 <option value="default">Default</option>
                 <option value="asc">Price: Low to High</option>
@@ -168,7 +184,6 @@ function App() {
         <main className="px-8 pb-16 bg-gray-900">
           <ProductList
             products={sortedProducts}
-            filter={search}
             onProductClick={handleProductClick}
             onAddToCart={handleAddToCart}
             cart={cart}
